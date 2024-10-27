@@ -13,8 +13,50 @@ const App = () => {
   ];
 
   const [selected, setSelected] = useState(0);
+  const [points, setPoints] = useState(Array(anecdotes.length).fill(0));
+  const [mostVoted, setMostVoted] = useState(0);
 
-  return <div>{anecdotes[selected]}</div>;
+  const handleNextClick = () => {
+    const randonNumber = Math.floor(
+      Math.random() * (anecdotes.length - 1 - 0 + 1)
+    );
+    setSelected(randonNumber);
+  };
+
+  const getIndexOfMax = (arr) => {
+    const maxPoints = Math.max(...arr);
+    let indexOfMax = 0;
+    console.log('arr length: ', arr.length);
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i] === maxPoints) {
+        console.log('Found');
+        indexOfMax = i;
+        break;
+      }
+    }
+    console.log(indexOfMax);
+    return indexOfMax;
+  };
+
+  const handleVote = () => {
+    const updatedPoints = [...points];
+    updatedPoints[selected] += 1;
+    setPoints(updatedPoints);
+    const newMostVoted = getIndexOfMax(updatedPoints);
+    setMostVoted(newMostVoted);
+  };
+
+  return (
+    <>
+      <h1>Anecdote of the Day</h1>
+      <div>{anecdotes[selected]}</div>
+      <div>has {points[selected]} votes</div>
+      <button onClick={handleVote}>vote</button>
+      <button onClick={handleNextClick}>next anecdote</button>
+      <h1>Anecdote with most votes</h1>
+      <div>{anecdotes[mostVoted]}</div>
+    </>
+  );
 };
 
 export default App;
