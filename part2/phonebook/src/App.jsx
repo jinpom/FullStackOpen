@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import personService from './services/persons';
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
+import Notification from './components/Notification';
+import './index.css';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [notification, setNotification] = useState(null);
+  const [notificationType, setNotificationType] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -44,6 +47,14 @@ const App = () => {
         );
         setNewName('');
         setNewNumber('');
+        setNotification(
+          `Successfully replaced ${returnedPerson.name}'s number`
+        );
+        setNotificationType('success');
+        setTimeout(() => {
+          setNotification(null);
+          setNotificationType(null);
+        }, 5000);
       });
   };
 
@@ -72,6 +83,12 @@ const App = () => {
         setPersons(persons.concat(returnedPerson));
         setNewName('');
         setNewNumber('');
+        setNotification(`Successfully added ${returnedPerson.name}`);
+        setNotificationType('success');
+        setTimeout(() => {
+          setNotification(null);
+          setNotificationType(null);
+        }, 5000);
       });
     }
   };
@@ -80,9 +97,23 @@ const App = () => {
     const personToDelete = persons.find((person) => person.id === id);
     const isDeleteConfirmed = confirm(`Delete ${personToDelete.name} ?`);
     if (isDeleteConfirmed === true) {
-      personService.remove(id).then((deletedPerson) => {
-        setPersons(persons.filter((person) => person.id !== deletedPerson.id));
-      });
+      personService
+        .remove(id)
+        .then((deletedPerson) => {
+          setPersons(
+            persons.filter((person) => person.id !== deletedPerson.id)
+          );
+        })
+        .catch((error) => {
+          setNotification(
+            `Information of ${personToDelete.name} has already been romoved from server`
+          );
+          setNotificationType('error');
+          setTimeout(() => {
+            setNotification(null);
+            setNotificationType(null);
+          }, 5000);
+        });
     } else {
       return;
     }
@@ -95,6 +126,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} messageType={notificationType} />
 
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
 
