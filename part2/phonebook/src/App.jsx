@@ -12,7 +12,6 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
   const [notification, setNotification] = useState(null);
-  const [notificationType, setNotificationType] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -47,13 +46,12 @@ const App = () => {
         );
         setNewName('');
         setNewNumber('');
-        setNotification(
-          `Successfully replaced ${returnedPerson.name}'s number`
-        );
-        setNotificationType('success');
+        setNotification({
+          message: `Successfully replaced ${returnedPerson.name}'s number`,
+          type: 'success',
+        });
         setTimeout(() => {
           setNotification(null);
-          setNotificationType(null);
         }, 5000);
       });
   };
@@ -83,11 +81,12 @@ const App = () => {
         setPersons(persons.concat(returnedPerson));
         setNewName('');
         setNewNumber('');
-        setNotification(`Successfully added ${returnedPerson.name}`);
-        setNotificationType('success');
+        setNotification({
+          message: `Successfully added ${returnedPerson.name}`,
+          type: 'success',
+        });
         setTimeout(() => {
           setNotification(null);
-          setNotificationType(null);
         }, 5000);
       });
     }
@@ -105,13 +104,12 @@ const App = () => {
           );
         })
         .catch((error) => {
-          setNotification(
-            `Information of ${personToDelete.name} has already been romoved from server`
-          );
-          setNotificationType('error');
+          setNotification({
+            message: `Information of ${personToDelete.name} has already been romoved from server`,
+            type: 'error',
+          });
           setTimeout(() => {
             setNotification(null);
-            setNotificationType(null);
           }, 5000);
         });
     } else {
@@ -126,7 +124,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} messageType={notificationType} />
+      <Notification notification={notification} />
 
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
 
